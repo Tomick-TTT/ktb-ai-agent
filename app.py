@@ -109,13 +109,21 @@ if st.button("Generate Output"):
             
                 output = completion.choices[0].message.content
             
-            # STEP 4: DISPLAY RESULTS
-st.success("Task Completed!")
-st.markdown("---")
-st.markdown(output)
+if st.button("Generate Output"):
+    if not topic:
+        st.warning("Please enter a topic first!")
+    else:
+        with st.spinner(f"Agents are processing {mode}..."):
+            # ... all your search and completion code here ...
+            output = completion.choices[0].message.content
+            
+            # --- EVERYTHING BELOW MUST BE INDENTED FURTHER ---
+            st.success("Task Completed!")
+            st.markdown("---")
+            st.markdown(output)
             
             # STEP 5: PDF GENERATION
-try:
+            try:
                 pdf = FPDF()
                 pdf.add_page()
                 pdf.set_font("Arial", size=12)
@@ -140,5 +148,5 @@ try:
                     file_name=f"{mode.replace(' ', '_')}_{topic.replace(' ', '_')}.pdf",
                     mime="application/pdf"
                 )
-except Exception as e:
+            except Exception as e:
                 st.sidebar.error("PDF preview generated. (Note: Special characters may be omitted)")
