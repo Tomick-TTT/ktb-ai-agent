@@ -102,52 +102,31 @@ if st.button('Generate Content'):
                     temperature=0.7
                 )
                 
+                # ... (previous logic for research and generation) ...
+
                 output = completion.choices[0].message.content
-                
+        
                 # STEP 4: DISPLAY RESULTS
                 st.success("Task Completed!")
                 st.markdown("---")
                 st.markdown(output)
-                
-              
-             # STEP 5: PDF GENERATION
-try:
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    
-    # Title
-    pdf.set_font("Arial", 'B', 16)
-    pdf.cell(200, 10, txt=f"Analysis Report: {topic}", ln=True, align='C')
-    pdf.ln(10)
-    
-    # Process each line for bolding
-    for line in output.split('\n'):
-        # Clean the text for encoding compatibility
-        clean_line = line.encode('latin-1', 'ignore').decode('latin-1')
         
-        # Check if the line is meant to be a bold heading (starts and ends with **)
-        if clean_line.startswith('**') and clean_line.endswith('**'):
-            pdf.set_font("Arial", 'B', 12)
-            # Remove the asterisks for the final PDF display
-            display_text = clean_line.replace('**', '')
-            pdf.multi_cell(0, 10, txt=display_text)
-        else:
-            # Regular text
-            pdf.set_font("Arial", size=11)
-            # Remove asterisks even if they are in the middle of a sentence
-            display_text = clean_line.replace('**', '')
-            pdf.multi_cell(0, 10, txt=display_text)
+                # STEP 5: PDF GENERATION (MOVE THIS INSIDE THE BUTTON BLOCK)
+                try:
+                    pdf = FPDF()
+                    pdf.add_page()
+                    # ... (the rest of your PDF code) ...
             
-    pdf_bytes = pdf.output(dest='S').encode('latin-1')
-    
-    # Show Download Button in Sidebar
-    st.sidebar.success("✅ File Ready!")
-    st.sidebar.download_button(
-        label="📥 Download as PDF",
-        data=pdf_bytes,
-        file_name=f"{mode.replace(' ', '_')}_{topic.replace(' ', '_')}.pdf",
-        mime="application/pdf"
-    )
-except Exception as e:
-    st.sidebar.error("PDF preview generated. (Note: Special characters may be omitted)")
+                    pdf_bytes = pdf.output(dest='S').encode('latin-1')
+            
+                    # Show Download Button in Sidebar
+                    st.sidebar.success("✅ File Ready!")
+                    st.sidebar.download_button(
+                    label="📥 Download as PDF",
+                    data=pdf_bytes,
+                    file_name=f"{mode.replace(' ', '_')}_{topic.replace(' ', '_')}.pdf",
+                    mime="application/pdf"
+            )
+                except Exception as e:
+            # This error will now ONLY show if something actually goes wrong during generation
+                    st.sidebar.error("PDF generation error. Results are still visible above.")
