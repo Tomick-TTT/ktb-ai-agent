@@ -27,7 +27,7 @@ st.sidebar.title("🛠️ Agent Settings")
 # Persona Selector
 mode = st.sidebar.selectbox(
     "Select Agent Mode:",
-    ["General Research & Blog", "LinkedIn Post Generator", "Product Researcher"]
+    ["Researcher | Content Creator | SEO Optimizer", "LinkedIn Post Generator", "Product Researcher"]
 )
 
 # Initialise the GROQ Client
