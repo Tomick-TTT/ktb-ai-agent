@@ -4,7 +4,6 @@ import os
 from dotenv import load_dotenv
 from tavily import TavilyClient
 from groq import Groq
-from fpdf import FPDF
 
 # 1. SETUP: Must be the first Streamlit command
 st.set_page_config(page_title='Klugekopf TechBridge AI Agent', page_icon='🤖')
@@ -108,38 +107,4 @@ if st.button('Generate Content'):
                 st.success("Task Completed!")
                 st.markdown("---")
                 st.markdown(output)
-                
-                # STEP 5: PDF GENERATION
-                try:
-                    pdf = FPDF()
-                    pdf.add_page()
-                    pdf.set_auto_page_break(auto=True, margin=15)
-                    
-                    pdf.set_font("Arial", 'B', 16)
-                    pdf.cell(200, 10, txt=f"Analysis Report: {topic}", ln=True, align='C')
-                    pdf.ln(10)
-
-                    # Loop through lines
-                    for line in output.split('\n'):
-                        clean_line = line.encode('latin-1', 'ignore').decode('latin-1')
-                        if clean_line.startswith('**') and clean_line.endswith('**'):
-                            pdf.set_font("Arial", 'B', 12)
-                            pdf.multi_cell(0, 10, txt=clean_line.replace('**', ''))
-                        else:
-                            pdf.set_font("Arial", size=11)
-                            pdf.multi_cell(0, 10, txt=clean_line.replace('**', ''))
-                    
-                    pdf_bytes = pdf.output(dest='S').encode('latin-1')
-                    
-                    st.markdown("---")
-                    st.download_button(
-                        label="📥 Download Detailed Report (PDF)",
-                        data=pdf_bytes,
-                        file_name=f"{topic.replace(' ', '_')}.pdf",
-                        mime="application/pdf",
-                        key="main_download_btn"
-                    )
-                except Exception as e:
-                    st.error(f"PDF error: {e}")
-    else:
-        st.warning("Please enter a topic first!")
+            
