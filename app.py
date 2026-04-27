@@ -87,7 +87,7 @@ if st.button('Generate Content'):
                     - Market Demand analysis
                     - Competitor Insights
                     - Target Audience needs
-                    - eBay Optimization (Suggested title and 5 key selling points)
+                    - eCommerce Optimization (Suggested title and 5 key selling points)
                     """
                 }
 
