@@ -58,9 +58,38 @@ if st.button('Generate Content'):
                     1. Researcher - You have found this information: {research_text}
                     2. Content Creator - Write a detailed blog post about: {topic}
                     3. SEO Optimizer - Optimize the blog post with keywords, meta description and SEO tips
+                    
+                    Please provide:
+                    - A full blog post
+                    - Meta description
+                    - Recommended keywords
+                    - SEO tips
                     """,
-                    "LinkedIn Post Generator": f"Generate a LinkedIn post about {topic} using: {research_text}",
-                    "Product Researcher": f"Conduct product research on {topic} using: {research_text}"
+                    
+                    "LinkedIn Post Generator": f"""
+                    ROLE: Content Strategist. 
+                    TASK: Transform this research into a viral, "Humanized" LinkedIn post about {topic}.
+                    DATA: {research_text}
+                    
+                    INSTRUCTION: Use a professional yet conversational tone. 
+                    Please provide:
+                    - A punchy hook
+                    - 3-5 key value points
+                    - A call to action (CTA)
+                    - Relevant hashtags
+                    """,
+                    
+                    "Product Researcher": f"""
+                    ROLE: E-commerce Market Analyst. 
+                    TASK: Conduct deep-dive product research on: {topic}.
+                    DATA: {research_text}
+                    
+                    Please provide:
+                    - Market Demand analysis
+                    - Competitor Insights
+                    - Target Audience needs
+                    - eBay Optimization (Suggested title and 5 key selling points)
+                    """
                 }
 
                 # STEP 3: Generation (Groq)
