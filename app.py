@@ -30,13 +30,6 @@ mode = st.sidebar.selectbox(
     ["General Research & Blog", "LinkedIn Post Generator", "Product Researcher"]
 )
 
-# Technical options
-with st.sidebar.expander("Search Options"):
-    search_depth = st.radio("Search Depth:", ["basic", "advanced"], index=1)
-    max_results = st.slider("Max Results:", 1, 10, 5)
-
-st.sidebar.divider()
-
 # Initialise the GROQ Client
 client = Groq(api_key=GROQ_API_KEY)
 
@@ -48,22 +41,20 @@ st.info(f"Currently acting as your **{mode}**.")
 topic = st.text_input("What would you like to research today?", placeholder="e.g., AI in Project Management")
 
 # 4. EXECUTION LOGIC (Everything inside this block only runs on click)
-if st.button("Generate Output"):
-    if not topic:
-        st.warning("Please enter a topic first!")
-    else:
-        with st.spinner(f"Agents are processing {mode}..."):
-            # STEP 1: Research (Tavily)
+if st.button('Generate Content'):
+    if topic:
+        with st.spinner('Agents are working...'):
             tavily = TavilyClient(api_key=TAVILY_API_KEY)
-            search_response = tavily.search(query=topic, search_depth=search_depth, max_results=max_results)
-            research_text = "\n".join([r['content'] for r in search_response['results']])
+            research = tavily.search(query=topic, search_depth='advanced')
+            research_text = '\n'.join([r['content'] for r in research['results']])
+
             
             if not research_text:
                 st.error("No research data found. Try a different topic.")
             else:
                 # STEP 2: Persona Logic
                 prompts = {
-                    "General Research & Blog": f"""
+                    "Researcher | Content Creator | SEO Optimizer": f"""
                     You are a team of 3 AI agents:
                     1. Researcher - You have found this information: {research_text}
                     2. Content Creator - Write a detailed blog post about: {topic}
@@ -98,7 +89,7 @@ if st.button("Generate Output"):
                     - Market Demand analysis
                     - Competitor Insights
                     - Target Audience needs
-                    - eBay Optimization (Suggested title and 5 key selling points)
+                    - eCommerce Optimization (Suggested title and 5 key selling points)
                     """
                 }
 
@@ -118,31 +109,45 @@ if st.button("Generate Output"):
                 st.markdown("---")
                 st.markdown(output)
                 
-                # STEP 5: PDF GENERATION (Inside the button click)
-                try:
-                    pdf = FPDF()
-                    pdf.add_page()
-                    pdf.set_font("Arial", size=12)
-                    
-                    # Title
-                    pdf.set_font("Arial", 'B', 16)
-                    pdf.cell(200, 10, txt=f"Analysis Report: {topic}", ln=True, align='C')
-                    pdf.ln(10)
-                    
-                    # Content
-                    pdf.set_font("Arial", size=11)
-                    clean_text = output.encode('latin-1', 'ignore').decode('latin-1')
-                    pdf.multi_cell(0, 10, txt=clean_text)
-                    
-                    pdf_bytes = pdf.output(dest='S').encode('latin-1')
-                    
-                    # Show Download Button in Sidebar
-                    st.sidebar.success("✅ File Ready!")
-                    st.sidebar.download_button(
-                        label="📥 Download as PDF",
-                        data=pdf_bytes,
-                        file_name=f"{mode.replace(' ', '_')}_{topic.replace(' ', '_')}.pdf",
-                        mime="application/pdf"
-                    )
-                except Exception as e:
-                    st.sidebar.error("PDF generation error. Results are still visible above.")
+              
+             # STEP 5: PDF GENERATION
+try:
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    
+    # Title
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(200, 10, txt=f"Analysis Report: {topic}", ln=True, align='C')
+    pdf.ln(10)
+    
+    # Process each line for bolding
+    for line in output.split('\n'):
+        # Clean the text for encoding compatibility
+        clean_line = line.encode('latin-1', 'ignore').decode('latin-1')
+        
+        # Check if the line is meant to be a bold heading (starts and ends with **)
+        if clean_line.startswith('**') and clean_line.endswith('**'):
+            pdf.set_font("Arial", 'B', 12)
+            # Remove the asterisks for the final PDF display
+            display_text = clean_line.replace('**', '')
+            pdf.multi_cell(0, 10, txt=display_text)
+        else:
+            # Regular text
+            pdf.set_font("Arial", size=11)
+            # Remove asterisks even if they are in the middle of a sentence
+            display_text = clean_line.replace('**', '')
+            pdf.multi_cell(0, 10, txt=display_text)
+            
+    pdf_bytes = pdf.output(dest='S').encode('latin-1')
+    
+    # Show Download Button in Sidebar
+    st.sidebar.success("✅ File Ready!")
+    st.sidebar.download_button(
+        label="📥 Download as PDF",
+        data=pdf_bytes,
+        file_name=f"{mode.replace(' ', '_')}_{topic.replace(' ', '_')}.pdf",
+        mime="application/pdf"
+    )
+except Exception as e:
+    st.sidebar.error("PDF preview generated. (Note: Special characters may be omitted)")
